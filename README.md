@@ -5,6 +5,8 @@ simple example of using flask to generate an api
 
 [Flask](http://flask.pocoo.org/)
 :   `pip install Flask`
+[Requests](http://docs.python-requests.org/en/latest/)
+:   `pip install requests`
 
 ## How to Use
 
