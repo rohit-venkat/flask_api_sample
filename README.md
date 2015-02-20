@@ -22,3 +22,5 @@ From a command line run `python flask_api.py`.
 To test the api service using the Front End flask app, open another command line and run `python front_end.py`.
 
 This sample uses a simple list of objects as our data store. The principles can be easily transferred to using a backend of your choice.
+
+On the browser go to `http://localhost:5001` to view the front end portion.
