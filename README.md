@@ -9,6 +9,12 @@ simple example of using flask to generate an api
 [Requests](http://docs.python-requests.org/en/latest/)
 :   `pip install requests`
 
+[flask-httpauth](https://flask-httpauth.readthedocs.org/en/latest/)
+:   `pip install flask-httpauth`
+
+[passlib](https://pythonhosted.org/passlib/)
+:   `pip install passlib`
+
 ## How to Use
 
 From a command line run `python flask_api.py`.
