@@ -1,5 +1,5 @@
 curl -i -H "Content-Type: application/json" -X POST -d '{"user":"twaits", "password":"Passphrase1"}' http://localhost:5000/api/users/
-curl -u twaits:Passphrase1 -i http://localhost:5000/api/users/
+curl -u -i http://localhost:5000/api/users/
 
 curl -u twaits:Passphrase1 -i http://localhost:5000/api/movies/
 curl -u twaits:Passphrase1 -i http://localhost:5000/api/movies/2
