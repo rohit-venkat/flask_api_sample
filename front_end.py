@@ -12,7 +12,7 @@ def display_movies():
     return render_template('base.html', movies=movies)
 
 
-@app.route("/movie/<int:movie_id>")
+@app.route("/movies/<int:movie_id>")
 def display_movie(movie_id):
     url = "http://localhost:5000/api/movies/" + str(movie_id)
     r = requests.get(url)

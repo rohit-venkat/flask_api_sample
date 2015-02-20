@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, jsonify, abort, request, url_for
-from movies import movies
+from flask import Flask, jsonify, abort, request, url_for, g
+from flask.ext.httpauth import HTTPBasicAuth
+from movies import movies, users, User
+
+auth = HTTPBasicAuth()
+
 app = Flask(__name__)
 
 
 @app.route("/api/movies/", methods=['GET'])
+@auth.login_required
 def get_all_movies():
     """
     only called in response to a 'GET' request.
@@ -42,6 +47,7 @@ def get_all_movies():
 
 
 @app.route('/api/movies/', methods=['POST'])
+@auth.login_required
 def create_movie_object():
     """
     only called in response to a 'POST' request.
@@ -85,6 +91,7 @@ def create_movie_object():
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['GET'])
+@auth.login_required
 def get_movie_by_id(movie_id):
     """
     only called in response to a 'GET' request.
@@ -101,6 +108,7 @@ def get_movie_by_id(movie_id):
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['PUT'])
+@auth.login_required
 def update_task(movie_id):
 
     # Get the object to update
@@ -138,6 +146,7 @@ def update_task(movie_id):
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['DELETE'])
+@auth.login_required
 def delete_task(movie_id):
     # Get the object to delete
     movie = [movie for movie in movies if movie['id'] == movie_id]
@@ -151,6 +160,49 @@ def delete_task(movie_id):
 
     # Return success!
     return jsonify({'result': True})
+
+
+@app.route('/api/users/', methods=['GET'])
+def get_users():
+
+    # tmp_user = []
+
+    # for user in users:
+    #     tmp_user.append(user.get_json())
+
+    return jsonify({"users":[user.get_json() for user in users]})
+
+
+@app.route('/api/users/', methods=['POST'])
+def create_user():
+    """
+    only called in response to a 'POST' request.
+
+    Creates and persists a new user object
+
+    return the saved user object
+    """
+
+    # Check to see if the json is there, and if it has the required fields.
+    if not request.json or not 'user' in request.json or not 'password' in request.json:
+        abort(400, {'message': 'Required fields "user", "password" not in request.'})
+
+    user = User(request.json['user'], request.json['password'])
+
+    # save the new object. If you using an ORM, would be something like
+    # object.save()
+    user.save()
+
+    return jsonify({'user': user.get_json()}), 201
+
+
+@auth.verify_password
+def verify_password(username, password):
+    user = [user for user in users if user.username == username]
+    if len(user) == 0 or not user[0].verify_password(password):
+        return False
+    g.user = user[0]
+    return True
 
 
 #########################
@@ -183,4 +235,4 @@ def convert_id_to_uri(movie):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
