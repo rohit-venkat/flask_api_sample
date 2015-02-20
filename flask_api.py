@@ -35,7 +35,7 @@ def get_all_movies():
         return_movies = movies[offset:end]
 
 
-    return jsonify({"movies": return_movies)
+    return jsonify({"movies": return_movies})
 
     # Uncomment to return a URI rather than strict ID for objects.
     # return jsonify({'movies': [convert_id_to_uri(movie) for movie in return_movies]})
