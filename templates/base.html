@@ -1,0 +1,8 @@
+{% if movies %}
+    {% for movie in movies %}
+    <h1><a href="{{ url_for('display_movie', movie_id=movie.id) }}">{{movie.Title}}</a></h1>
+    <p>{{movie.Plot}}</p>
+    {% endfor %}
+{% else %}
+<p>Sorry, no movies available</p>
+{% endif %}
