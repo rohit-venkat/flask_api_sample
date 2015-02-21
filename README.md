@@ -26,3 +26,18 @@ To test the api service using the Front End flask app, open another command line
 This sample uses a simple list of objects as our data store. The principles can be easily transferred to using a backend of your choice.
 
 On the browser go to `http://localhost:5001` to view the front end portion.
+
+## Future Work
+
+This demo/example would work great with a simple mongo backend and ORM implementation in the code.
+
+Also, it would be nice to set up a [Vagrant]() script for launching a VM with all the dependencies pre-installed so users could see it working without installing and configuring dependencies themselves.
+
+## Acknowledgements
+
+In preparing this demo, I consulted and pulled from a few tutorials online:
+
+* [Designing a RESTful API with Python and Flask](http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask)
+* [RESTful Authentication with Flask](http://blog.miguelgrinberg.com/post/restful-authentication-with-flask)
+* [How to Build an API with Python and Flask](http://tech.pro/tutorial/1213/how-to-build-an-api-with-python-and-flask)
+* [PassLib Tutorials](https://pythonhosted.org/passlib/)
