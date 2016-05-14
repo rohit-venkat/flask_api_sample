@@ -10,7 +10,7 @@ app = Flask(__name__)
 def display_movies():
     r = requests.get('http://localhost:5000/api/movies', auth=('twaits', 'Passphrase1'))
     movies = r.json()['movies']
-    return render_template('base.html', movies=movies)
+    return render_template('home.html', movies=movies)
 
 
 @app.route("/movies/<int:movie_id>")

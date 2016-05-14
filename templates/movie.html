@@ -1,18 +1,40 @@
-<h1>{{movie.Title}}</a></h1>
-<p>{{movie.Plot}}</p>
-<img src="{{movie.Poster}}"/>
-<ul>
-    <li>{{movie.Year}}</li>
-    <li>{{movie.Rated}}</li>
-    <li>{{movie.Released}}</li>
-    <li>{{movie.Runtime}}</li>
-    <li>{{movie.Genre}}</li>
-    <li>{{movie.Director}}</li>
-    <li>{{movie.Writer}}</li>
-    <li>{{movie.Actors}}</li>
-    <li>{{movie.Language}}</li>
-    <li>{{movie.Country}}</li>
-    <li>{{movie.Awards}}</li>
-    <li>{{movie.Metascore}}</li>
-    <li>{{movie.imdbRating}}</li>
-</ul>
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="jumbotron">
+    <div class="container">
+        <a href="/" class="btn btn-default"><span class="glyphicon glyphicon-home"></span> Home</a>
+        <div class="media">
+            <div class="media-left">
+                <a href="#">
+                    <img class="media-object" src="{{movie.Poster}}" alt="{{movie.Title}}-poster">
+                </a>
+            </div>
+            <div class="media-body">
+                <h1>{{movie.Title}} <small>{{movie.Year}}</small></h1>
+                <p>{{movie.Plot}}</p>
+                <ul class="list-inline">
+                    <li><small>Runtime:</small> {{movie.Runtime}}</li>
+                    <li><small>Rating:</small> {{movie.Rated}}</li>
+                    <li><small>Release Date:</small> {{movie.Released}}</li>
+                    <li><small>Genre:</small> {{movie.Genre}}</li>
+                    <li><small>Language:</small> {{movie.Language}}</li>
+                    <li><small>Country:</small> {{movie.Country}}</li>
+                    <li><small>Metascore:</small> {{movie.Metascore}}</li>
+                    <li><small>IMDB:</small> {{movie.imdbRating}}</li>
+                    <li><small>Awards:</small> {{movie.Awards}}</li>
+                </ul>
+                <ul class="list-unstyled">
+                    <li><small>Directed by</small> {{movie.Director}}</li>
+                    <li><small>Written by</small> {{movie.Writer}}</li>
+                    <li><small>Featuring</small> {{movie.Actors}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+
+</div>
+{% endblock %}
