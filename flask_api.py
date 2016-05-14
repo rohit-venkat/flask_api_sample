@@ -3,7 +3,7 @@
 
 from flask import Flask, jsonify, abort, request, url_for, g
 from flask.ext.httpauth import HTTPBasicAuth
-from movies import movies, users, User
+from models import movies, users, User
 
 auth = HTTPBasicAuth()
 
