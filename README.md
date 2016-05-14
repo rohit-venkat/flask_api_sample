@@ -21,17 +21,21 @@ From a command line run `python flask_api.py`.
 
 Run `curl -i -H "Content-Type: application/json" -X POST -d '{"user":"twaits", "password":"Passphrase1"}' http://localhost:5000/api/users/` from the command line in order to have the user password needed to use the front end.
 
+A list of `curl` commands to test the REST API is included in `curl_commands.txt`.
+
 To test the api service using the Front End flask app, open another command line and run `python front_end.py`.
 
 This sample uses a simple list of objects as our data store. The principles can be easily transferred to using a backend of your choice.
 
 On the browser go to `http://localhost:5001` to view the front end portion.
 
+You can run tests from the command line by running `python api_tests.py`.
+
 ## Future Work
 
 This demo/example would work great with a simple mongo backend and ORM implementation in the code.
 
-Also, it would be nice to set up a [Vagrant]() script for launching a VM with all the dependencies pre-installed so users could see it working without installing and configuring dependencies themselves.
+Also, it would be nice to set up a [Vagrant]('https://www.vagrantup.com/') script for launching a VM with all the dependencies pre-installed so users could see it working without installing and configuring dependencies themselves.
 
 ## Acknowledgements
 
