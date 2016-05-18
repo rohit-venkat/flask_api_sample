@@ -1,0 +1,7 @@
+{
+	"hostname": "fa-stage.fa-stage.b4.internal.cloudapp.net",
+	"run_list": [ 
+		"role[api]",
+		"role[web]"
+	]
+}
