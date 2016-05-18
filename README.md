@@ -1,7 +1,11 @@
 # flask_api_sample
 simple example of using flask to generate an api
 
-## Dependencies
+## Setup
+
+This project has a Vagrant-backed platform and standard setup. The Vagrant box is Ubuntu 14.04 and is provided by Hashicorp. Running `vagrant up` will stand up the VM and provision it with the dependencies required to run this application. The operator will need to `vagrant ssh` into the VM and start the services as described below in the section "How to Use".
+
+Alternatively, the following Python modules may be installed by hand directly on your computer to meet the application's requirements for a local (bare metal) run.
 
 [Flask](http://flask.pocoo.org/)
 :   `pip install Flask`
@@ -17,19 +21,23 @@ simple example of using flask to generate an api
 
 ## How to Use
 
-From a command line run `python flask_api.py`.
+From a command line at the root of the project, run
 
-Run `curl -i -H "Content-Type: application/json" -X POST -d '{"user":"twaits", "password":"Passphrase1"}' http://localhost:5000/api/users/` from the command line in order to have the user password needed to use the front end.
+	python flask_api.py
 
 A list of `curl` commands to test the REST API is included in `curl_commands.txt`.
 
-To test the api service using the Front End flask app, open another command line and run `python front_end.py`.
+To test the api service using the Front End flask app, open another terminal window and run 
+
+	python front_end.py
 
 This sample uses a simple list of objects as our data store. The principles can be easily transferred to using a backend of your choice.
 
-On the browser go to `http://localhost:5001` to view the front end portion.
+On the browser go to either `http://localhost:5001` (if running locally) or `http://localhost:8000` (if running in the VM) to view the front end portion.
 
-You can run tests from the command line by running `python api_tests.py`.
+You can run tests from the command line by running 
+
+	python api_tests.py
 
 ## Future Work
 
