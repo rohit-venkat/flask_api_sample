@@ -3,7 +3,7 @@
 end
 
 bash "install-requirements" do
-	cwd "/vagrant"
+	cwd "#{node[:base_folder]}"
 	code <<-EOH
 		pip install -r requirements.txt
 	EOH

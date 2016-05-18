@@ -13,15 +13,16 @@ Vagrant.configure(2) do |config|
     v.cpus = "2"
   end
 
-  config.vm.provision :chef_solo do |chef|
+  config.vm.provision :chef_zero do |chef|
 
-    chef.version = "12.6"
     chef.log_level = "warn"
+    chef.version = "12.10.58"
     
     chef.environment = "development"
     chef.roles_path = "./roles"
     chef.environments_path = "./environments"
-    
+    chef.nodes_path = "./nodes"
+
     chef.add_role "api"
     chef.add_role "web"
 

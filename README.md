@@ -5,6 +5,8 @@ simple example of using flask to generate an api
 
 This project has a Vagrant-backed platform and standard setup. The Vagrant box is Ubuntu 14.04 and is provided by Hashicorp. Running `vagrant up` will stand up the VM and provision it with the dependencies required to run this application. The operator will need to `vagrant ssh` into the VM and start the services as described below in the section "How to Use".
 
+**This configuration has been tested successfully with Vagrant 1.8.1. Vagrant 1.7.3 will _not_ work with the specified `chef-zero` provisioner.**
+
 Alternatively, the following Python modules may be installed by hand directly on your computer to meet the application's requirements for a local (bare metal) run.
 
 [Flask](http://flask.pocoo.org/)
