@@ -4,6 +4,7 @@ import unittest
 import json
 import base64
 
+
 class FlaskMovieAPITests(unittest.TestCase):
 
     @classmethod
@@ -24,11 +25,12 @@ class FlaskMovieAPITests(unittest.TestCase):
         pass
 
     def open_with_auth(self, url, method, username, password, *args, **kwargs):
-        return self.app.open(url,
+        authStr = username + ":" + password
+        return self.app.open(
+            url,
             method=method,
             headers={
-                'Authorization': 'Basic ' + base64.b64encode(username + \
-                ":" + password)
+                'Authorization': 'Basic ' + base64.b64encode(authStr.encode('ascii'))
             },
             *args, **kwargs
         )
@@ -204,12 +206,14 @@ class FlaskMovieAPITests(unittest.TestCase):
 
     # Test update movie with bad data
     def test_update_movie_success(self):
+        jsonStr = json.dumps(dict(Rated=True,
+                                  Director='Wes Bnderson'))
+
         result=self.open_with_auth('/api/movies/11',
                                    'PUT',
                                    'twaits',
                                    'Passphrase1',
-                                   data=json.dumps(dict(Rated=True,
-                                            Director='Wes Bnderson')),
+                                   data=json.dumps(dict(Rated=True, Director='Wes Bnderson')),
                                    content_type = 'application/json')
 
         self.assertEqual(result.status_code, 400)

@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import os
+from datetime import datetime
 from flask import Flask, jsonify, abort, request, url_for, g
-from flask.ext.httpauth import HTTPBasicAuth
-from models import movies, users, User
+from flask_httpauth import HTTPBasicAuth
+from models import db, movies, users, User, Movie
 
 auth = HTTPBasicAuth()
 
 app = Flask(__name__)
+app.config.update(dict(
+    DEBUG=True,
+    SECRET_KEY='development key',
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.root_path, 'flask_api.db')
+))
+
+db.init_app(app)
 
 
 @app.route("/api/movies/", methods=['GET'])
@@ -30,17 +38,26 @@ def get_all_movies():
         filter_query = filter_query.replace("+"," ")
         filters = filter_query.split(',')
         for filter_str in filters:
-            [return_movies.append(movie) for movie in movies[offset:end] if filter_str in movie.values()]
-            # Using list comprehesion to say:
-            # for movie in movies[offset:end]:
-            #   if filter_str in movie.values():
-            #       return_movies.append(movie)
+            [return_movies.append(movie) for movie in Movie.query.filter(or_(
+                    Movie.title.like(filter_str),
+                    Movie.year.like(filter_str),
+                    Movie.rating.like(filter_str),
+                    Movie.runtime.like(filter_str),
+                    Movie.genre.like(filter_str),
+                    Movie.director.like(filter_str),
+                    Movie.writer.like(filter_str),
+                    Movie.actors.like(filter_str),
+                    Movie.plot.like(filter_str),
+                    Movie.language.like(filter_str),
+                    Movie.country.like(filter_str),
+                    Movie.awards.like(filter_str)
+                ))]
 
     else:
-        return_movies = movies[offset:end]
+        return_movies = Movie.query.offset(offset).limit(limit).all()
 
 
-    return jsonify({"movies": return_movies})
+    return jsonify({"movies": [movie.json for movie in return_movies]})
 
     # Uncomment to return a URI rather than strict ID for objects.
     # return jsonify({'movies': [convert_id_to_uri(movie) for movie in return_movies]})
@@ -63,31 +80,31 @@ def create_movie_object():
         # abort(400)
 
     # Generate a new object from the request to save to DB.
-    movie = {
-        'id': movies[-1]['id'] + 1,
-        'Title': request.json['Title'],
-        'Plot': request.json.get('Plot', u""),
-        'Year': request.json['Year'],
-        'Rated': request.json.get('Rated', u""),
-        'Released': request.json.get('Released', u""),
-        'Runtime': request.json.get('Runtime', u""),
-        'Genre': request.json.get('Genre', u""),
-        'Director': request.json.get('Director', u""),
-        'Writer': request.json.get('Writer', u""),
-        'Actors': request.json.get('Actors', u""),
-        'Language': request.json.get('Language', u""),
-        'Country': request.json.get('Country', u""),
-        'Awards': request.json.get('Awards', u""),
-        'Poster': request.json.get('Poster', u""),
-        'Metascore': request.json.get('Metascore', u""),
-        'imdbRating': request.json.get('imdbRating', u"")
-    }
+    movie = Movie(
+                title=request.json['Title'],
+                year=request.json['Year'],
+                rating=request.json.get('Rated', u""),
+                released=request.json.get('Released', u""),
+                runtime=request.json.get('Runtime', u""),
+                genre=request.json.get('Genre', u""),
+                director=request.json.get('Director', u""),
+                writer=request.json.get('Writer', u""),
+                actors=request.json.get('Actors', u""),
+                plot=request.json.get('Plot', u""),
+                language=request.json.get('Language', u""),
+                country=request.json.get('Country', u""),
+                awards=request.json.get('Awards', u""),
+                poster=request.json.get('Poster', u""),
+                metascore=request.json.get('Metascore', u""),
+                imdbRating=request.json.get('imdbRating', u"")
+            )
 
     # save the new object. If you using an ORM, would be something like
     # object.save()
-    movies.append(movie)
+    db.session.add(movie)
+    db.session.commit()
 
-    return jsonify({'movie': movie}), 201
+    return jsonify({'movie': Movie.query.get(movie.id).json}), 201
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['GET'])
@@ -98,12 +115,11 @@ def get_movie_by_id(movie_id):
 
     return a movie object by id
     """
-    movie = [movie for movie in movies if movie['id'] == movie_id]
-
-    if len(movie) == 0:
+    movie = Movie.query.get(movie_id)
+    if not movie:
         abort(404)
 
-    return jsonify({'movie': movie[0]})
+    return jsonify({'movie': movie.json})
     # return jsonify({'movie': convert_id_to_uri(movie[0])})
 
 
@@ -112,11 +128,12 @@ def get_movie_by_id(movie_id):
 def update_task(movie_id):
 
     # Get the object to update
-    movie = [movie for movie in movies if movie['id'] == movie_id]
+
+    movie = Movie.query.get(movie_id)
 
     # Validate the data
     # Does the object exits?
-    if len(movie) == 0:
+    if not movie == 0:
         abort(404)
 
     # Is there json in the request?
@@ -124,10 +141,11 @@ def update_task(movie_id):
         abort(400, {'message': 'No json found in request'})
 
     # Are the values valid types?
-    for key in movie[0]:
-        if key in request.json and type(request.json[key]) is not type(movie[0][key]):
-            message = "%s is %s. %s passed in from request" % (key, type(movie[0][key]), type(request.json[key]))
+    for key in movies[0]:
+        if key in request.json and type(request.json[key]) is not type(movies[0][key]):
+            message = "%s is %s. %s passed in from request" % (key, type(movies[0][key]), type(request.json[key]))
             abort(400, {'message': message})
+
 
     # This is a sample:
     # We could write a test case for each field individually.
@@ -137,12 +155,25 @@ def update_task(movie_id):
     # Once everything looks good, update the object.
     # Here we are saying use the value from the request if it exists,
     # otherwise, default to the value already stored.
-    for key, value in movie[0].iteritems():
-        if key is not 'id':
-            print "%s > JSON: %s || Object: %s" % (key, request.json.get(key, "Not here"), str(value))
-            movie[0][key] = request.json.get(key, value)
+    
+    movie.title=request.json['Title'],
+    movie.year=request.json['Year'],
+    movie.rating=request.json.get('Rated', u""),
+    movie.released=request.json.get('Released', u""),
+    movie.runtime=request.json.get('Runtime', u""),
+    movie.genre=request.json.get('Genre', u""),
+    movie.director=request.json.get('Director', u""),
+    movie.writer=request.json.get('Writer', u""),
+    movie.actors=request.json.get('Actors', u""),
+    movie.plot=request.json.get('Plot', u""),
+    movie.language=request.json.get('Language', u""),
+    movie.country=request.json.get('Country', u""),
+    movie.awards=request.json.get('Awards', u""),
+    movie.poster=request.json.get('Poster', u""),
+    movie.metascore=request.json.get('Metascore', u""),
+    movie.imdbRating=request.json.get('imdbRating', u"")
 
-    return jsonify({'movie': movie[0]})
+    return jsonify({'movie': movie.json})
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['DELETE'])
@@ -151,12 +182,15 @@ def delete_task(movie_id):
     # Get the object to delete
     movie = [movie for movie in movies if movie['id'] == movie_id]
 
+    movie = Movie.query.get(movie_id)
+
     # Does the object exits?
-    if len(movie) == 0:
+    if not movie:
         abort(404)
 
     # Delete the object from the data store
-    movies.remove(movie[0])
+    db.session.delete(movie)
+    db.session.commit()
 
     # Return success!
     return jsonify({'result': True})
@@ -164,13 +198,7 @@ def delete_task(movie_id):
 
 @app.route('/api/users/', methods=['GET'])
 def get_users():
-
-    # tmp_user = []
-
-    # for user in users:
-    #     tmp_user.append(user.get_json())
-
-    return jsonify({"users":[user.get_json() for user in users]})
+    return jsonify({"users":[user.get_json() for user in User.query.all()]})
 
 
 @app.route('/api/users/', methods=['POST'])
@@ -187,11 +215,12 @@ def create_user():
     if not request.json or not 'user' in request.json or not 'password' in request.json:
         abort(400, {'message': 'Required fields "user", "password" not in request.'})
 
-    user = User(request.json['user'], request.json['password'])
+    user = User(request.json['user'], password_hash=User.hash_password(request.json['password']))
 
     # save the new object. If you using an ORM, would be something like
     # object.save()
-    user.save()
+    db.session.add(user)
+    db.session.commit()
 
     return jsonify({'user': user.get_json()}), 201
 
@@ -199,9 +228,10 @@ def create_user():
 @auth.verify_password
 def verify_password(username, password):
     user = [user for user in users if user.username == username]
-    if len(user) == 0 or not user[0].verify_password(password):
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.verify_password(password):
         return False
-    g.user = user[0]
+    g.user = user
     return True
 
 
@@ -235,7 +265,43 @@ def convert_id_to_uri(movie):
 
 
 if __name__ == "__main__":
-    user = User("twaits", "Passphrase1")
-    user.save()
-    print user.__dict__
     app.run(debug=True)
+
+
+#########################
+# Flask CLI Commands    #
+#########################
+
+@app.cli.command('initdb')
+def initdb_command():
+    """Creates the database tables."""
+    db.drop_all()
+    db.create_all()
+
+    admin = User(username='twaits', password_hash=User.hash_password('Passphrase1'))
+    db.session.add(admin)
+    db.session.commit()
+
+    for movie in movies:
+        m = Movie(
+                title=movie['Title'],
+                year=movie['Year'],
+                rating=movie['Rated'],
+                released=movie['Released'],
+                runtime=movie['Runtime'],
+                genre=movie['Genre'],
+                director=movie['Director'],
+                writer=movie['Writer'],
+                actors=movie['Actors'],
+                plot=movie['Plot'],
+                language=movie['Language'],
+                country=movie['Country'],
+                awards=movie['Awards'],
+                poster=movie['Poster'],
+                metascore=movie['Metascore'],
+                imdbRating=movie['imdbRating']
+            )
+        db.session.add(m)
+        db.session.commit()
+
+    print('Initialized the database.')

@@ -3,8 +3,8 @@
 
 from flask import Flask, render_template
 import requests
-from requests.auth import HTTPBasicAuth
 app = Flask(__name__)
+
 
 @app.route("/")
 def display_movies():
