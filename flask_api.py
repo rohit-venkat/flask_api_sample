@@ -4,7 +4,8 @@ import os
 from datetime import datetime
 from flask import Flask, jsonify, abort, request, url_for, g
 from flask_httpauth import HTTPBasicAuth
-from models import db, movies, users, User, Movie
+from models import db, User, Movie
+from bootstrap_models import movies
 
 auth = HTTPBasicAuth()
 
@@ -198,7 +199,7 @@ def delete_task(movie_id):
 
 @app.route('/api/users/', methods=['GET'])
 def get_users():
-    return jsonify({"users":[user.get_json() for user in User.query.all()]})
+    return jsonify({"users":[user.json for user in User.query.all()]})
 
 
 @app.route('/api/users/', methods=['POST'])
@@ -227,7 +228,6 @@ def create_user():
 
 @auth.verify_password
 def verify_password(username, password):
-    user = [user for user in users if user.username == username]
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_password(password):
         return False
@@ -262,10 +262,6 @@ def convert_id_to_uri(movie):
         else:
             tmp[field] = movie[field]
     return tmp
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
 
 
 #########################
@@ -305,3 +301,7 @@ def initdb_command():
         db.session.commit()
 
     print('Initialized the database.')
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
