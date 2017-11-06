@@ -6,6 +6,8 @@ from flask import Flask, jsonify, abort, request, url_for, g
 from flask_httpauth import HTTPBasicAuth
 from models import db, User, Movie
 from bootstrap_models import movies
+from flask_restful import Api
+from resources import MovieResource, MovieListResource
 
 auth = HTTPBasicAuth()
 
@@ -16,8 +18,11 @@ app.config.update(dict(
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.root_path, 'flask_api.db')
 ))
 
+api = Api(app)
 db.init_app(app)
 
+api.add_resource(MovieListResource, '/api2/movies/', endpoint='movies')
+api.add_resource(MovieResource, '/api2/movies/<int:id>', endpoint='movie')
 
 @app.route("/api/movies/", methods=['GET'])
 @auth.login_required
