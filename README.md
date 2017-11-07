@@ -32,9 +32,7 @@ You can run tests from the command line by running `python api_tests.py`.
 
 ## Future Work
 
-This demo/example would work great with a simple mongo backend and ORM implementation in the code.
-
-Also, it would be nice to set up a [Vagrant]('https://www.vagrantup.com/') script for launching a VM with all the dependencies pre-installed so users could see it working without installing and configuring dependencies themselves.
+Also, it would be nice to set up a [Vagrant]('https://www.vagrantup.com/') script for launching a VM with all the dependencies pre-installed so users could see it working without installing and configuring dependencies themselves. Or [Docker](https://www.docker.com/) :).
 
 ## Acknowledgements
 
