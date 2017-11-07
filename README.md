@@ -3,27 +3,26 @@ simple example of using flask to generate an api
 
 ## Dependencies
 
-[Flask](http://flask.pocoo.org/)
-:   `pip install Flask`
+`pip install -r requirements.txt`
 
-[Requests](http://docs.python-requests.org/en/latest/)
-:   `pip install requests`
-
-[flask-httpauth](https://flask-httpauth.readthedocs.org/en/latest/)
-:   `pip install flask-httpauth`
-
-[passlib](https://pythonhosted.org/passlib/)
-:   `pip install passlib`
+* [Flask](http://flask.pocoo.org/)
+* [Requests](http://docs.python-requests.org/en/latest/)
+* [flask-httpauth](https://flask-httpauth.readthedocs.org/en/latest/)
+* [passlib](https://pythonhosted.org/passlib/)
+* [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/)
+* [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
 
 ## How to Use
 
-From a command line run `python flask_api.py`.
+From a command line run:
 
-Run `curl -i -H "Content-Type: application/json" -X POST -d '{"user":"twaits", "password":"Passphrase1"}' http://localhost:5000/api/users/` from the command line in order to have the user password needed to use the front end.
+* `export FLASK_APP=flask_api.py`
+* `flask initdb`
+* `flask run` (Runs the service on `http://localhost:5000`) 
 
 A list of `curl` commands to test the REST API is included in `curl_commands.txt`.
 
-To test the api service using the Front End flask app, open another command line and run `python front_end.py`.
+To test the api service using the Front End flask app, open another command line and run `python front_end.py` (Runs the app on `http://localhost:5001`).
 
 This sample uses a simple list of objects as our data store. The principles can be easily transferred to using a backend of your choice.
 
