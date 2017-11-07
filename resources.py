@@ -1,6 +1,7 @@
 from flask_restful import Resource, fields, reqparse, marshal_with, abort
 from flask import request
 from models import db, Movie, User
+from auth import auth
 
 movie_fields = {
     'id': fields.Integer,
@@ -48,6 +49,7 @@ parser.add_argument('imdbRating', type=float, location='json')
 
 
 class MovieResource(Resource):
+    @auth.login_required
     @marshal_with(movie_fields)
     def get(self, id):
         movie = Movie.query.get(id)
@@ -57,6 +59,7 @@ class MovieResource(Resource):
 
         return movie
 
+    @auth.login_required
     def delete(self, id):
         movie = Movie.query.get(id)
         if not movie:
@@ -65,6 +68,7 @@ class MovieResource(Resource):
         db.session.commit()
         return {}, 204
 
+    @auth.login_required
     @marshal_with(movie_fields)
     def put(self, id):
         parsed_args = parser.parse_args()
@@ -97,6 +101,7 @@ class MovieResource(Resource):
 
 
 class MovieListResource(Resource):
+    @auth.login_required
     @marshal_with(movie_fields)
     def get(self):
         query_parser = reqparse.RequestParser()
@@ -140,6 +145,7 @@ class MovieListResource(Resource):
         
         return movies.all()
 
+    @auth.login_required
     @marshal_with(movie_fields)
     def post(self):
         parsed_args = parser.parse_args()
@@ -175,6 +181,7 @@ user_parser.add_argument('password', type=str, required=True, location='json')
 
 
 class UserResource(Resource):
+    @auth.login_required
     @marshal_with(user_fields)
     def get(self, username):
         user = User.query.filter_by(username=username).first()
@@ -184,6 +191,7 @@ class UserResource(Resource):
 
         return user
 
+    @auth.login_required
     def delete(self, username):
         user = User.query.filter_by(username=username).first()
 
@@ -195,6 +203,7 @@ class UserResource(Resource):
 
         return {}, 204
 
+    @auth.login_required
     @marshal_with(user_fields)
     def put(self, username):
         user = User.query.filter_by(username=username).first()
@@ -214,12 +223,14 @@ class UserResource(Resource):
         return user
 
 class UserListResource(Resource):
+    @auth.login_required
     @marshal_with(user_fields)
     def get(self):
         users = User.query.all()
 
         return users
 
+    @auth.login_required
     @marshal_with(user_fields)
     def post(self):
         user_args = user_parser.parse_args()
