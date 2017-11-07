@@ -7,7 +7,12 @@ from flask_httpauth import HTTPBasicAuth
 from models import db, User, Movie
 from bootstrap_models import movies
 from flask_restful import Api
-from resources import MovieResource, MovieListResource
+from resources import (
+    MovieResource, 
+    MovieListResource, 
+    UserResource, 
+    UserListResource
+)
 
 auth = HTTPBasicAuth()
 
@@ -23,6 +28,8 @@ db.init_app(app)
 
 api.add_resource(MovieListResource, '/api2/movies/', endpoint='movies')
 api.add_resource(MovieResource, '/api2/movies/<int:id>', endpoint='movie')
+api.add_resource(UserListResource, '/api2/users/', endpoint='users' )
+api.add_resource(UserResource, '/api2/users/<string:username>', endpoint='user' )
 
 @app.route("/api/movies/", methods=['GET'])
 @auth.login_required

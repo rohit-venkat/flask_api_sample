@@ -21,7 +21,11 @@ movie_fields = {
     'metascore': fields.String,
     'imdbRating': fields.Float,
     'uri': fields.Url('movie', absolute=True)
+}
 
+user_fields = {
+    'id': fields.Integer,
+    'username': fields.String
 }
 
 parser = reqparse.RequestParser(bundle_errors=True)
@@ -56,8 +60,8 @@ class MovieResource(Resource):
     def delete(self, id):
         movie = Movie.query.get(id)
         if not movie:
-            abort(404, message="Todo {} doesn't exist".format(id))
-        db.session.delete(todo)
+            abort(404, message="Movie {} doesn't exist".format(id))
+        db.session.delete(movie)
         db.session.commit()
         return {}, 204
 
@@ -67,7 +71,7 @@ class MovieResource(Resource):
         movie = Movie.query.get(id)
         
         if not movie:
-            abort(404, message="Todo {} doesn't exist".format(id))
+            abort(404, message="Movie {} doesn't exist".format(id))
         
         movie.title = parsed_args['title']
         movie.year = parsed_args['year']
@@ -163,3 +167,66 @@ class MovieListResource(Resource):
         db.session.add(movie)
         db.session.commit()
         return movie, 201
+
+
+user_parser = reqparse.RequestParser(bundle_errors=True)
+user_parser.add_argument('username', type=str, required=True, location='json')
+user_parser.add_argument('password', type=str, required=True, location='json')
+
+
+class UserResource(Resource):
+    @marshal_with(user_fields)
+    def get(self, username):
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            abort(404, "User %s: not found." % username)
+
+        return user
+
+    def delete(self, username):
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            abort(404, "User %s: not found." % username)
+
+        db.session.delete(user)
+        db.session.commit()
+
+        return {}, 204
+
+    @marshal_with(user_fields)
+    def put(self, username):
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            abort(404, "User %s: not found." % username)
+
+        password_parser = reqparse.RequestParser()
+        password_parser.add_argument('password', type=str, required=True, location='json')
+        
+        password_arg = password_parser.parse_args()
+        
+        user.password_hash = User.hash_password(password_arg['password'])
+
+        db.session.commit()
+
+        return user
+
+class UserListResource(Resource):
+    @marshal_with(user_fields)
+    def get(self):
+        users = User.query.all()
+
+        return users
+
+    @marshal_with(user_fields)
+    def post(self):
+        user_args = user_parser.parse_args()
+
+        user = User(username=user_args['username'], password_hash=User.hash_password(user_args['password']))
+
+        db.session.add(user)
+        db.session.commit()
+
+        return user, 201
